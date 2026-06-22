@@ -1,0 +1,5 @@
+{
+  "outputFormat": "table",
+  "safeDelete": true,
+  "logLevel": "info"
+}
