@@ -63,13 +63,19 @@ export async function convertFile(inputPath: string, outputPath: string): Promis
   await fs.writeFile(outputPath, output);
 }
 
-export async function validateJsonSchema(dataPath: string, schemaPath: string): Promise<boolean> {
+export async function validateJsonSchema(
+  dataPath: string,
+  schemaPath: string
+): Promise<{ valid: boolean; errors?: string[] }> {
   const data = await fs.readJson(dataPath);
   const schema = await fs.readJson(schemaPath);
   const ajv = new Ajv2020();
   const validate = ajv.compile(schema);
   const valid = validate(data);
-  return Boolean(valid);
+  return {
+    valid: Boolean(valid),
+    errors: validate.errors?.map((error) => `${error.instancePath || '/'} ${error.message ?? 'invalid'}`)
+  };
 }
 
 export async function watchPattern(pattern: string, callback: (event: string, file: string) => void): Promise<void> {

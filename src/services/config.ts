@@ -47,7 +47,15 @@ function validateConfig(config: Partial<CliConfig>): Partial<CliConfig> {
 }
 
 export function loadConfig(cwd = process.cwd()): CliConfig {
-  dotenv.config({ path: path.join(cwd, '.env'), quiet: true });
+  const envPath = path.join(cwd, '.env');
+  if (fs.existsSync(envPath)) {
+    const envValues = dotenv.parse(fs.readFileSync(envPath, 'utf-8'));
+    for (const [key, value] of Object.entries(envValues)) {
+      if (process.env[key] === undefined) {
+        process.env[key] = value;
+      }
+    }
+  }
 
   const userPath = path.join(os.homedir(), '.clirc');
   const projectPath = path.join(cwd, '.clirc');
